@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>HamsterDoro</title>
+<style>
+  :root{
+    --bg:#1f1f1f;
+    --panel:#f8f1e3;
+    --pink:#FF5784;
+    --orange:#FF911B;
+    --purple:#AC6DFF;
+    --text:#333;
+    --muted:#bdbdbd;
+    --white:#fff;
+  }
+  html,body{height:100%;margin:0;background:var(--bg);font-family: "Poppins", system-ui, sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;}
+  .app{
+    max-width:1100px;
+    margin:24px auto;
+    padding: 16px;
+    display:flex;
+    gap:24px;
+    align-items:flex-start;
+  }
+
+  /* left palette / spacer */
+  .left-col{
+    width:120px;
+    display:flex;
+    gap:18px;
+    flex-direction:column;
+    align-items:center;
+    padding-top:8px;
+  }
+  .swatch{ width:64px;height:64px;border-radius:999px;box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
+  .sw1{background:var(--white)}
+  .sw2{background:var(--pink)}
+  .sw3{background:var(--orange)}
+  .sw4{background:#f8f1e3}
+  .sw5{background:var(--purple)}
+  .sw6{background:#d6c69a}
+
+  /* main column */
+  .main{
+    flex:1;
+    display:flex;
+    gap:28px;
+    flex-direction:column;
+  }
+
+  /* Start panel */
+  .start-panel{
+    width:380px;
+    background:#f3e9d9;
+    border-radius:4px;
+    padding:0;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+  }
+  .start-header{
+    background:#c9b98f;
+    color:white;
+    font-weight:800;
+    font-size:clamp(20px,3vw,36px);
+    padding:12px 18px;
+    border-top-left-radius:4px;border-top-right-radius:4px;
+    letter-spacing:1px;
+  }
+  .start-body{
+    padding:12px;
+    background:var(--panel);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .input-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:transparent;
+    padding:6px;
+  }
+  label{flex:1;color:#fff;font-weight:700;text-transform:lowercase}
+  .input-mini{
+    width:64px;
+    border-radius:999px;
+    border:0;
+    padding:6px 8px;
+    text-align:center;
+    font-weight:700;
+    background:white;
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,0.06);
+  }
+  .input-row span.badge{
+    margin-left:auto;
+    font-weight:800;
+    background:rgba(0,0,0,0.06);
+    border-radius:999px;
+    padding:6px 10px;
+  }
+  .start-play{
+    display:flex;
+    justify-content:center;
+    padding:18px 0 24px 0;
+  }
+  .play-btn{
+    width:120px;height:120px;border-radius:999px;background:rgba(0,0,0,0.06);display:grid;place-items:center;font-size:40px;border:0;cursor:pointer;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+  }
+
+  /* timers grid */
+  .timers-row{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+  }
+  .panel{
+    width:280px;
+    min-width:220px;
+    border-radius:6px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.25);
+  }
+  .panel .header{
+    padding:12px;
+    color:var(--white);
+    font-weight:800;
+    font-size:clamp(18px,2.5vw,28px);
+    text-align:center;
+  }
+  .panel .body{
+    padding:18px;
+    background:var(--panel);
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    align-items:center;
+  }
+
+  /* circular timer container responsive */
+  .circular-wrap{
+    width:clamp(160px,20vw,220px);
+    height:clamp(160px,20vw,220px);
+    max-width:260px;
+    max-height:260px;
+    position:relative;
+    display:grid;
+    place-items:center;
+  }
+
+  /* Responsive header and countdown constraints: center and scale vertically + horizontally */
+  .countdown{
+    font-weight:900;
+    font-size:clamp(22px,3.5vw,40px);
+    letter-spacing:2px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* bottom controls */
+  .controls{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    width:100%;
+    gap:12px;
+    margin-top:6px;
+  }
+  .btn{
+    border-radius:999px;
+    padding:8px 12px;
+    min-width:48px;
+    border:0;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.18);
+  }
+  .btn.stop{background:var(--white)}
+  .btn.skip{background:var(--white)}
+
+  /* small circular dot icons */
+  .dot{width:26px;height:26px;border-radius:999px;display:inline-block;margin-right:8px;vertical-align:middle}
+
+  /* SVG timer styles */
+  .ring-svg{transform: rotate(-90deg); width:100%; height:100%;}
+  .ring-bg{stroke-width:14; fill:none; opacity:0.22;}
+  .ring-fg{stroke-width:14; fill:none; stroke-linecap:round;}
+  .hamster-svg{position:absolute; width:58%; height:58%; top:21%; left:21%; transform-origin:50% 50%;}
+  .hamster-group{transform-origin:50% 50%;}
+  /* hamster variants */
+  .ham-run{ animation:run-bounce 700ms linear infinite; }
+  .ham-eat{ animation:eat-nod 1200ms ease-in-out infinite; }
+  .ham-sleep{ animation:sleep-sway 2500ms ease-in-out infinite; }
+
+  /* some simple keyframes to give life */
+  @keyframes run-bounce {
+    0%{transform:translateY(0) translateX(-2%) rotate(0);}
+    50%{transform:translateY(-6%) translateX(2%) rotate(-2deg);}
+    100%{transform:translateY(0) translateX(-2%) rotate(0);}
+  }
+  @keyframes eat-nod {
+    0%{transform:translateY(0) scale(1);}
+    50%{transform:translateY(-4%) scale(0.985);}
+    100%{transform:translateY(0) scale(1);}
+  }
+  @keyframes sleep-sway {
+    0%{transform:translateY(0) rotate(0);}
+    50%{transform:translateY(2%) rotate(3deg);}
+    100%{transform:translateY(0) rotate(0);}
+  }
+
+  /* footer smaller text */
+  .muted{color:var(--muted); font-size:13px; margin-top:6px;}
+  /* responsive small screens */
+  @media (max-width:760px){
+    .app{padding:12px}
+    .left-col{display:none}
+    .start-panel{width:100%;}
+    .panel{width:100%}
+    .timers-row{flex-direction:column}
+  }
+</style>
+</head>
+<body>
+<div class="app" role="application" aria-label="HamsterDoro app">
+  <div class="left-col" aria-hidden="true">
+    <div class="swatch sw1"></div>
+    <div class="swatch sw2"></div>
+    <div class="swatch sw3"></div>
+    <div class="swatch sw4"></div>
+    <div class="swatch sw5"></div>
+    <div class="swatch sw6"></div>
+  </div>
+
+  <div class="main">
+    <!-- Start Panel -->
+    <section class="start-panel" id="startPanel" role="region" aria-label="Start screen">
+      <div class="start-header">HAMSTERDORO</div>
+      <div class="start-body">
+        <div class="input-row" style="background:var(--pink);border-radius:10px;padding:8px;">
+          <label for="inputF" style="color:var(--white)">lock in !!! (min)</label>
+          <input id="inputF" class="input-mini" type="number" min="1" value="30" />
+          <span class="badge">F</span>
+        </div>
+        <div class="input-row" style="background:var(--orange);border-radius:10px;padding:8px;">
+          <label for="inputSB" style="color:var(--white)">short break (min)</label>
+          <input id="inputSB" class="input-mini" type="number" min="1" value="5" />
+          <span class="badge">SB</span>
+        </div>
+        <div class="input-row" style="background:var(--purple);border-radius:10px;padding:8px;">
+          <label for="inputLB" style="color:var(--white)">long break (min)</label>
+          <input id="inputLB" class="input-mini" type="number" min="1" value="15" />
+          <span class="badge">LB</span>
+        </div>
+
+        <div class="start-play">
+          <button class="play-btn" id="startBtn" aria-label="Start Focus">▶</button>
+        </div>
+        <div style="font-size:13px;color:#6b6b6b;text-align:center">Set your minutes and press play — the timer will start with "lock in !!!"</div>
+      </div>
+    </section>
+
+    <!-- Timers Row -->
+    <div class="timers-row" role="region" aria-label="timers">
+      <!-- Focus Panel -->
+      <article class="panel" id="panelF" aria-hidden="true">
+        <div class="header" style="background:var(--pink);">lock in !!!</div>
+        <div class="body">
+          <div class="circular-wrap">
+            <!-- SVG circle -->
+            <svg class="ring-svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <linearGradient id="gradPink" x1="0" x2="1">
+                  <stop offset="0%" stop-color="#FF7AA0"/>
+                  <stop offset="100%" stop-color="#FF5784"/>
+                </linearGradient>
+              </defs>
+              <circle class="ring-bg" cx="100" cy="100" r="78" stroke="#d6c69a"></circle>
+              <circle id="ringF" class="ring-fg" cx="100" cy="100" r="78" stroke="url(#gradPink)"></circle>
+            </svg>
+            <!-- hamster svg (running) -->
+            <svg class="hamster-svg ham-run" viewBox="0 0 100 100" aria-hidden="true">
+              <!-- simplistic hamster lines -->
+              <g class="hamster-group" fill="#e9dacb" stroke="#7c6d60" stroke-width="1.6">
+                <ellipse cx="52" cy="50" rx="26" ry="20"/>
+                <circle cx="35" cy="40" r="7" />
+                <circle cx="63" cy="36" r="4" />
+                <path d="M28 56 q6 -6 12 -4" />
+                <path d="M60 62 q10 2 14 6" />
+              </g>
+            </svg>
+          </div>
+
+          <div class="countdown" id="countF">--:--</div>
+          <div class="controls">
+            <button class="btn stop" id="stopF" aria-label="Stop to Start">⏹</button>
+            <div style="flex:1;text-align:center;color:#6b6b6b;font-weight:700">F</div>
+            <button class="btn skip" id="skipF" aria-label="Skip to Break">⏭</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Short Break Panel -->
+      <article class="panel" id="panelSB" aria-hidden="true">
+        <div class="header" style="background:var(--orange);">short break :)</div>
+        <div class="body">
+          <div class="circular-wrap">
+            <svg class="ring-svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <linearGradient id="gradOrange" x1="0" x2="1">
+                  <stop offset="0%" stop-color="#ffd0a8"/>
+                  <stop offset="100%" stop-color="#FF911B"/>
+                </linearGradient>
+              </defs>
+              <circle class="ring-bg" cx="100" cy="100" r="78" stroke="#d6c69a"></circle>
+              <circle id="ringSB" class="ring-fg" cx="100" cy="100" r="78" stroke="url(#gradOrange)"></circle>
+            </svg>
+
+            <svg class="hamster-svg ham-eat" viewBox="0 0 100 100" aria-hidden="true">
+              <g class="hamster-group" fill="#e9dacb" stroke="#7c6d60" stroke-width="1.6">
+                <ellipse cx="50" cy="52" rx="26" ry="20"/>
+                <circle cx="35" cy="43" r="6" />
+                <path d="M50 62 q4 -6 8 -6" />
+                <path d="M58 46 q6 2 10 0" />
+              </g>
+            </svg>
+          </div>
+
+          <div class="countdown" id="countSB">--:--</div>
+          <div class="controls">
+            <button class="btn stop" id="stopSB" aria-label="Stop to Start">⏹</button>
+            <div style="flex:1;text-align:center;color:#6b6b6b;font-weight:700">SB</div>
+            <button class="btn skip" id="skipSB" aria-label="Skip to Focus">⏭</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Long Break Panel -->
+      <article class="panel" id="panelLB" aria-hidden="true">
+        <div class="header" style="background:var(--purple);">long break :D</div>
+        <div class="body">
+          <div class="circular-wrap">
+            <svg class="ring-svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <linearGradient id="gradPurple" x1="0" x2="1">
+                  <stop offset="0%" stop-color="#d8b7ff"/>
+                  <stop offset="100%" stop-color="#AC6DFF"/>
+                </linearGradient>
+              </defs>
+              <circle class="ring-bg" cx="100" cy="100" r="78" stroke="#d6c69a"></circle>
+              <circle id="ringLB" class="ring-fg" cx="100" cy="100" r="78" stroke="url(#gradPurple)"></circle>
+            </svg>
+
+            <svg class="hamster-svg ham-sleep" viewBox="0 0 100 100" aria-hidden="true">
+              <g class="hamster-group" fill="#e9dacb" stroke="#7c6d60" stroke-width="1.6">
+                <ellipse cx="52" cy="54" rx="28" ry="18"/>
+                <circle cx="62" cy="45" r="4" />
+                <path d="M40 60 q6 -6 18 -6" />
+              </g>
+            </svg>
+          </div>
+
+          <div class="countdown" id="countLB">--:--</div>
+          <div class="controls">
+            <button class="btn stop" id="stopLB" aria-label="Stop to Start">⏹</button>
+            <div style="flex:1;text-align:center;color:#6b6b6b;font-weight:700">LB</div>
+            <button class="btn skip" id="skipLB" aria-label="Skip to Focus">⏭</button>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="muted">Tip: every 3rd "lock in !!!" session goes to Long Break automatically.</div>
+  </div>
+</div>
+
+<script>
+/*
+  HamsterDoro - single-file vanilla JS
+  - state machine for Start, F, SB, LB
+  - circular SVG animation using stroke-dashoffset
+  - smooth update via requestAnimationFrame
+  - Stop (⏹) returns to start and resets
+  - Skip (⏭) jumps to next appropriate state
+*/
+
+(() => {
+  // DOM refs
+  const startPanel = document.getElementById('startPanel');
+  const startBtn = document.getElementById('startBtn');
+  const inputF = document.getElementById('inputF');
+  const inputSB = document.getElementById('inputSB');
+  const inputLB = document.getElementById('inputLB');
+
+  const panelF = document.getElementById('panelF');
+  const panelSB = document.getElementById('panelSB');
+  const panelLB = document.getElementById('panelLB');
+
+  const countF = document.getElementById('countF');
+  const countSB = document.getElementById('countSB');
+  const countLB = document.getElementById('countLB');
+
+  const stopF = document.getElementById('stopF');
+  const skipF = document.getElementById('skipF');
+  const stopSB = document.getElementById('stopSB');
+  const skipSB = document.getElementById('skipSB');
+  const stopLB = document.getElementById('stopLB');
+  const skipLB = document.getElementById('skipLB');
+
+  // rings
+  const ringF = document.getElementById('ringF');
+  const ringSB = document.getElementById('ringSB');
+  const ringLB = document.getElementById('ringLB');
+
+  // state
+  let state = 'start'; // 'start' | 'F' | 'SB' | 'LB'
+  let timer = null; // interval id
+  let raf = null;   // rAF id
+  let startTime = null; // epoch ms
+  let totalDuration = 0; // seconds
+  let remaining = 0; // seconds
+  let lastTick = 0;
+
+  // keep track of how many completed F sessions
+  let fCount = parseInt(localStorage.getItem('hamster_fcount') || '0', 10);
+
+  // helpers
+  function minutesToSeconds(min){ return Math.max(1, Math.round(Number(min))) * 60; }
+  function secToMMSS(s){
+    s = Math.max(0, Math.round(s));
+    const mm = Math.floor(s / 60).toString().padStart(2,'0');
+    const ss = (s % 60).toString().padStart(2,'0');
+    return `${mm}:${ss}`;
+  }
+
+  // circle math
+  function initRing(ringEl){
+    const r = Number(ringEl.getAttribute('r'));
+    const len = 2 * Math.PI * r;
+    ringEl.style.strokeDasharray = `${len} ${len}`;
+    ringEl._len = len;
+    ringEl.style.strokeDashoffset = '0';
+  }
+  [ringF, ringSB, ringLB].forEach(initRing);
+
+  // show/hide panels
+  function showStart(){
+    state = 'start';
+    clearTimer();
+    startPanel.style.display = '';
+    panelF.setAttribute('aria-hidden','true'); panelF.style.display = 'none';
+    panelSB.setAttribute('aria-hidden','true'); panelSB.style.display = 'none';
+    panelLB.setAttribute('aria-hidden','true'); panelLB.style.display = 'none';
+  }
+
+  function showPanel(name){
+    startPanel.style.display = 'none';
+    panelF.style.display = 'none'; panelSB.style.display = 'none'; panelLB.style.display = 'none';
+    panelF.setAttribute('aria-hidden','true');
+    panelSB.setAttribute('aria-hidden','true');
+    panelLB.setAttribute('aria-hidden','true');
+
+    if(name === 'F'){ panelF.style.display = ''; panelF.setAttribute('aria-hidden','false'); state='F'; }
+    if(name === 'SB'){ panelSB.style.display = ''; panelSB.setAttribute('aria-hidden','false'); state='SB'; }
+    if(name === 'LB'){ panelLB.style.display = ''; panelLB.setAttribute('aria-hidden','false'); state='LB'; }
+  }
+
+  // update countdown text and ring progress
+  function updateUI(){
+    if(state === 'F'){
+      countF.textContent = secToMMSS(remaining);
+      const p = 1 - (remaining / totalDuration);
+      ringF.style.strokeDashoffset = String(ringF._len * (1 - p));
+    } else if(state === 'SB'){
+      countSB.textContent = secToMMSS(remaining);
+      const p = 1 - (remaining / totalDuration);
+      ringSB.style.strokeDashoffset = String(ringSB._len * (1 - p));
+    } else if(state === 'LB'){
+      countLB.textContent = secToMMSS(remaining);
+      const p = 1 - (remaining / totalDuration);
+      ringLB.style.strokeDashoffset = String(ringLB._len * (1 - p));
+    }
+  }
+
+  // main timer loop uses requestAnimationFrame for smooth ring updates and 1s tick for remaining seconds
+  function startTimerFor(seconds){
+    clearTimer();
+    totalDuration = Math.max(1, Math.round(seconds)); // seconds
+    remaining = totalDuration;
+    startTime = performance.now();
+    lastTick = performance.now();
+    // run rAF loop
+    function step(now){
+      // compute precise elapsed seconds
+      const elapsedSec = (now - startTime) / 1000;
+      const rem = Math.max(0, totalDuration - elapsedSec);
+      remaining = rem;
+      // update UI
+      updateUI();
+      // if time reached zero -> stop and go to next
+      if(rem <= 0.05){ // small epsilon
+        // finish
+        clearTimer();
+        onTimerComplete();
+        return;
+      }
+      raf = requestAnimationFrame(step);
+    }
+    raf = requestAnimationFrame(step);
+  }
+
+  function clearTimer(){
+    if(raf) cancelAnimationFrame(raf);
+    raf = null;
+  }
+
+  function onTimerComplete(){
+    if(state === 'F'){
+      // increment completed F count
+      fCount++;
+      localStorage.setItem('hamster_fcount', String(fCount));
+      // choose next
+      if(fCount % 3 === 0){
+        goToLB();
+      } else {
+        goToSB();
+      }
+    } else if(state === 'SB'){
+      goToF();
+    } else if(state === 'LB'){
+      goToF();
+    }
+  }
+
+  // transitions
+  function goToF(){
+    showPanel('F');
+    // read time value from inputs (in minutes) and convert to seconds
+    const t = minutesToSeconds(inputF.value);
+    startTimerFor(t);
+  }
+  function goToSB(){
+    showPanel('SB');
+    const t = minutesToSeconds(inputSB.value);
+    startTimerFor(t);
+  }
+  function goToLB(){
+    showPanel('LB');
+    const t = minutesToSeconds(inputLB.value);
+    startTimerFor(t);
+  }
+
+  // stop -> to start and reset ring/text
+  function stopToStart(){
+    clearTimer();
+    // reset UI numbers
+    countF.textContent = '--:--';
+    countSB.textContent = '--:--';
+    countLB.textContent = '--:--';
+    // reset rings
+    [ringF,ringSB,ringLB].forEach(r => r && (r.style.strokeDashoffset = '0'));
+    showStart();
+  }
+
+  // skip handlers
+  function skipCurrent(){
+    clearTimer();
+    if(state === 'F'){
+      // treat as if finished but do not increment fCount
+      if((fCount + 1) % 3 === 0){
+        // skipping still advances to LB if this would be the third F? The spec: "Skip Button goes to SB and skips remaining timeF" — you requested in F stretch goal: Skip goes to SB
+        // However main requirement: every 3rd occurrence of F go to LB. We'll respect the main rule: if this skip would complete a full F we will *count* it as completed.
+        // Implementation choice: treat skip as finishing the F session (so it counts). This is consistent with "skip remaining timeF".
+        fCount++;
+        localStorage.setItem('hamster_fcount', String(fCount));
+      } else {
+        // skip counts as a completed F
+        fCount++;
+        localStorage.setItem('hamster_fcount', String(fCount));
+      }
+      // after completing, go to SB or LB based on updated fCount
+      if(fCount % 3 === 0){
+        goToLB();
+      } else {
+        goToSB();
+      }
+    } else if(state === 'SB'){
+      goToF();
+    } else if(state === 'LB'){
+      goToF();
+    }
+  }
+
+  // wire buttons
+  startBtn.addEventListener('click', () => {
+    // save input to localStorage for persistence
+    localStorage.setItem('hamster_timeF', inputF.value);
+    localStorage.setItem('hamster_timeSB', inputSB.value);
+    localStorage.setItem('hamster_timeLB', inputLB.value);
+    // go to F and start timer
+    goToF();
+  });
+
+  stopF.addEventListener('click', stopToStart);
+  stopSB.addEventListener('click', stopToStart);
+  stopLB.addEventListener('click', stopToStart);
+
+  skipF.addEventListener('click', skipCurrent);
+  skipSB.addEventListener('click', skipCurrent);
+  skipLB.addEventListener('click', skipCurrent);
+
+  // Load saved inputs
+  (function loadSaved(){
+    const vF = localStorage.getItem('hamster_timeF');
+    const vSB = localStorage.getItem('hamster_timeSB');
+    const vLB = localStorage.getItem('hamster_timeLB');
+    if(vF) inputF.value = vF;
+    if(vSB) inputSB.value = vSB;
+    if(vLB) inputLB.value = vLB;
+  })();
+
+  // init state
+  showStart();
+
+  // Accessibility: keyboard Start (Enter) from any input
+  [inputF,inputSB,inputLB].forEach(inp => {
+    inp.addEventListener('keydown', e => {
+      if(e.key === 'Enter') startBtn.click();
+    });
+  });
+
+  // Expose small API on window for debugging (optional)
+  window.hamsterDoro = {
+    goToF, goToSB, goToLB, stopToStart,
+    getState: () => state,
+    getFcount: () => fCount
+  };
+})();
+</script>
+</body>
+</html>
