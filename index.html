@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>HamsterDoro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="start" class="screen active">
+    <h1>HamsterDoro</h1>
+    <div class="input-row pink">
+      <label for="timeF">lock in !!!</label>
+      <input id="timeF" type="number" min="1" value="30">
+    </div>
+    <div class="input-row orange">
+      <label for="timeSB">short break</label>
+      <input id="timeSB" type="number" min="1" value="5">
+    </div>
+    <div class="input-row purple">
+      <label for="timeLB">long break</label>
+      <input id="timeLB" type="number" min="1" value="15">
+    </div>
+    <button id="startBtn">▶</button>
+  </div>
+
+  <div id="focus" class="screen">
+    <h2 class="pink">lock in !!!</h2>
+    <div class="circle pink">
+      <svg>
+        <circle cx="100" cy="100" r="90"/>
+      </svg>
+      <div class="hamster">🐹🏃</div>
+    </div>
+    <div id="timeFocus" class="time">00:00</div>
+    <div class="controls">
+      <button id="stopF">⏹</button>
+      <button id="skipF">⏭</button>
+    </div>
+  </div>
+
+  <div id="shortBreak" class="screen">
+    <h2 class="orange">short break :)</h2>
+    <div class="circle orange">
+      <svg>
+        <circle cx="100" cy="100" r="90"/>
+      </svg>
+      <div class="hamster">🐹🍪</div>
+    </div>
+    <div id="timeSBDisplay" class="time">00:00</div>
+    <div class="controls">
+      <button id="stopSB">⏹</button>
+      <button id="skipSB">⏭</button>
+    </div>
+  </div>
+
+  <div id="longBreak" class="screen">
+    <h2 class="purple">long break :D</h2>
+    <div class="circle purple">
+      <svg>
+        <circle cx="100" cy="100" r="90"/>
+      </svg>
+      <div class="hamster">🐹💤</div>
+    </div>
+    <div id="timeLBDisplay" class="time">00:00</div>
+    <div class="controls">
+      <button id="stopLB">⏹</button>
+      <button id="skipLB">⏭</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
