@@ -1,0 +1,11 @@
+project-root/
+  index.html
+  styles.css
+  app.js
+  assets/
+    run_1.png ... run_6.png
+    eat_1.png ... eat_6.png
+    sleep_1.png ... sleep_6.png
+    start_focus.mp3        <-- optional placeholder sound
+    break_start.mp3        <-- optional placeholder sound
+    cycle_end.mp3          <-- optional placeholder sound
